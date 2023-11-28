@@ -1,0 +1,222 @@
+Content
+
+Intro to Redux 
+
+*************************************************************************************************************************
+
+===>Redux ஐ install செய்ய பயன்படுத்தும் command lines:
+    npm install redux
+
+===>Example:
+
+main.jsx:
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import { createStore } from 'redux'
+
+
+// Step 1 : Define a Initial state
+state = 0
+
+
+// Step 2 : Define a Action
+//  action = {
+//   key : value
+// }
+const counterReducer = (state = 0, action) => {
+  switch(action.type) {
+    case 'INCR' : 
+        return state + 1;
+    
+    case 'DECR' : 
+        return state - 1;
+
+    default :
+        return state;
+  }
+}
+
+
+// Step 3 : Create a Store
+const store = createStore(counterReducer);
+
+
+// Step 4 : Get the current store state
+console.log(store.getState());
+
+
+// Step 6 : use subscribe method
+store.subscribe( () => {
+  console.log(store.getState());
+})
+
+
+// Step 5 : Increment the counter
+store.dispatch( {
+  type : 'INCR'
+} );
+console.log(store.getState());
+
+store.dispatch( {
+  type : 'INCR'
+} );
+console.log(store.getState());
+
+store.dispatch( {
+  type : 'DECR'
+} );
+console.log(store.getState());
+
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+
+
+
+கவனிக்க வேண்டியவை:
+Step 4 :Store செய்துள்ள current value ஐ கண்டறிய getState() ஐ என்ற function பயன்படுகிறது.
+        இது ஒரு வகையான method ஆகும்.
+        எனவே "0" என்ற output வருகிறது.
+
+Step 5 :நம்மால் நேரடியாக state ன் உடைய value ஐ மாற்ற முடியாது. 
+        அதாவது state + 1 ( - or + => condition => increment or decremnet or any condition )
+        எனவே dispatch என்ற முறையை பயன்படுத்துகிறோம்.
+
+        Step 4 க்கு output "0" என்று வரும்.
+        Step 5 இப்போது output "1" என்று வரும்.அதாவது increment ஆகி வருகிறது.
+               இப்போது மீண்டும் increment ஆகி "2" என்று வரும்.
+               இப்போது decremnet ஆகி "1" என்று வரும்.
+
+Step 6 :ஒவ்வொரு முறையும் கொடுப்பதற்கு 
+        console.log(store.getState()); பதிலாக 
+        "subscribe" என்ற method ஐ பயன்படுத்தி அதற்குள் console ஐ கொடுத்து 
+        அதை ஒரு function போன்று பயன்படுத்தலாம்.அதனை நாம் call செய்தால் போதும்.
+        ஆகவே இதனை delete செய்கிறோம்.
+
+
+Changes and Add some Content:
+
+[1] Command the App.jsx 
+// import App from './App.jsx' => 
+
+[2] Declared an App
+const App = () => {
+  return (
+    <div>
+      <div>
+        Count : {store.getState()}
+      </div>
+
+      <button onClick={ () =>store.dispatch( {type : 'INCR'} )}>Add</button>
+      <button onClick={ () =>store.dispatch( {type : 'DECR'} )}>Subtract</button>
+      <button onClick={ () =>store.dispatch( {type : 'ZERO'} )}>Zero</button>
+    </div>
+  )
+}
+
+[3]
+const root = ReactDOM.createRoot(document.getElementById('root'))
+
+const renderApp = () => {
+  root.render(<App />)
+}
+renderApp()
+
+store.subscribe(renderApp)
+
+
+இவ்வாறு main.jsx ல் நேரடியாக கொடுத்து output ஐ பெற இயலும்.
+
+
+**************************( அல்லது )**********************************
+
+
+****வழக்கம்போல் App.jsx ல் கொடுத்தும் output ஐ பெற இயலும்.*****
+
+
+===>அதற்கு முதலில் react-redux ஐ install செய்ய வேண்டும்.அதற்கான commands lines
+    npm install react-redux
+
+
+main.jsx:
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import { createStore } from 'redux'
+import { Provider } from 'react-redux'
+
+const counterReducer = (state = 0, action) => {
+  switch(action.type) {
+    case 'INCR' : 
+        return state + 1;
+    
+    case 'DECR' : 
+        return state - 1;
+    
+    case 'ZERO' : 
+        return 0;
+
+    default :
+        return state;
+  }
+}
+
+const store = createStore(counterReducer);
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+)
+
+
+கவனிக்க வேண்டியவை:
+
+[1]delete செய்ய வேண்டும்.
+  
+// Step 6 : use subscribe method
+store.subscribe( () => {
+  console.log(store.getState());
+})
+
+
+
+App.jsx
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+
+function App() {
+
+  const dispatch = useDispatch()
+  const counter = useSelector ((state) => state)
+
+    return (
+      <div>
+        <div>
+          Count : {counter}
+        </div>
+  
+        <button onClick={ () =>dispatch( {type : 'INCR'} )}>Add</button>
+        <button onClick={ () =>dispatch( {type : 'DECR'} )}>Subtract</button>
+        <button onClick={ () =>dispatch( {type : 'ZERO'} )}>Zero</button>
+      </div>
+    )
+  }
+
+export default App
+
+
+
+கவனிக்க வேண்டியவை:
+
+[1]
+dispatch என்ற method ஐ access அல்லது import செய்வதற்கு useDispatch() என்ற hook பயன்படுகிறது.
+state ஐ import செய்வதற்காக useSelector() என்ற hook பயன்படுகிறது.
+
+
+output:    main.jsx & App.jsx 
+
+screen ல் Add Subtract Zero என்ற பட்டன்கள் வந்துவிடும்.
+மேலும் அந்த பட்டன்களை தொடும் போது condition ஆனது rendering ஆகும்.
+
+*************************************************************************************************************************
